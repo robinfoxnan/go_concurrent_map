@@ -19,14 +19,18 @@ m.Set(199010212, "bar")
 bar, ok := m.Get(199010212)
 fmt.Println(bar, ok)
 
+
+```
+
 假如我需要实现几个计数器，实现并发安全更新计数，
+
+```go
 // 计数器
 type BaseCounter struct {
 	Count     uint64
 	CountLast uint64
 }
 ```
-
 
 我们需要使用其中带回调的更新函数：
 
@@ -40,7 +44,7 @@ func InitMaps() {
 }
 ```
 
-```gp
+```go
 // 会在更新时候加锁期间回调
 // 没有值，则设置；如果有，则更新; 新增的部分通过新的值传递过来！
 func appAddCallBack(exist bool, valueInMap *BaseCounter, newValue *BaseCounter) *BaseCounter {
