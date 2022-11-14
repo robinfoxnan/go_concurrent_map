@@ -105,6 +105,24 @@ func (m ConcurrentMap[K, V]) Upsert(key K, value V, cb UpsertCb[V]) (res V) {
 	return res
 }
 
+// should return a new value
+type InsertCb[V any] func() V
+
+// get value, or do callback when is empty
+func (m ConcurrentMap[K, V]) GetOrInsert(key K, cb InsertCb[V]) (res V) {
+	shard := m.GetShard(key)
+	shard.Lock()
+	defer shard.Unlock()
+	v, ok := shard.items[key]
+	if ok == false {
+		res = cb()
+		shard.items[key] = res
+		v = res
+	}
+	return v
+}
+
+
 // Sets the given value under the specified key if no value was associated with it.
 func (m ConcurrentMap[K, V]) SetIfAbsent(key K, value V) bool {
 	// Get map shard.
